@@ -58,6 +58,11 @@ def cargar_todas():
                 "Servicios":      f.get("Servicios Destacados", ""),
                 "Investigado":    investigado,
                 "Últ. Act.":      f.get("Últ. Act. Base", ""),
+                "Teléfono":       f.get("Teléfono", ""),
+                "Contacto":       f.get("Contacto Técnico", ""),
+                "Cargo":          f.get("Cargo", ""),
+                "Dirección":      f.get("Dirección", ""),
+                "Redes":          f.get("Redes / IG", ""),
             })
         offset = data.get("offset")
         if not offset:
@@ -270,6 +275,53 @@ with tab2:
     c3.metric("🟢 Alta confianza", alta)
     c4.metric("🟡 Media",          media)
     c5.metric("⚫ Baja / s/d",     baja + sd)
+
+    # ── Última investigación ─────────────────────────────────────────────────────
+    st.divider()
+    st.subheader("🆕  Última investigación")
+    fechas = sorted(
+        [x for x in inv["Últ. Act."].dropna().astype(str).unique().tolist() if x],
+        reverse=True,
+    ) if "Últ. Act." in inv.columns else []
+    if not fechas:
+        st.info("Todavía no hay empresas con fecha de actualización.")
+    else:
+        cfa, cfb = st.columns([2, 6])
+        with cfa:
+            fecha_sel = st.selectbox("Fecha de actualización", fechas, key="ult_fecha")
+        ult = inv[inv["Últ. Act."].astype(str) == fecha_sel]
+        n_mail = int((ult["Email"].astype(str).str.strip() != "").sum())
+        n_tel  = int((ult["Teléfono"].astype(str).str.strip() != "").sum())
+        n_web  = int((ult["Website"].astype(str).str.strip() != "").sum())
+        with cfb:
+            st.caption(
+                f"**{len(ult)}** empresas actualizadas · {n_mail} con email · "
+                f"{n_tel} con teléfono · {n_web} con sitio web"
+            )
+        ICONO = {"alta": "🟢", "media": "🟡", "baja": "⚫"}
+        for _, r in ult.sort_values("Razón Social").iterrows():
+            nombre = r["Razón Social"] or "(sin nombre)"
+            if r["Nombre Comercial"]:
+                nombre += f" — {r['Nombre Comercial']}"
+            conf = r["Confianza"] or "s/d"
+            with st.expander(f"{ICONO.get(r['Confianza'], '⚪')}  {nombre}  ·  confianza {conf}"):
+                ca, cb = st.columns(2)
+                with ca:
+                    ubic = ", ".join([x for x in [r["Localidad"], r["Provincia"]] if x])
+                    st.markdown(f"**Ubicación:** {ubic or '—'}" + (f"  ·  **IATA/OACI:** {r['IATA']}" if r["IATA"] else ""))
+                    st.markdown(f"**Email:** {r['Email'] or '—'}")
+                    st.markdown(f"**Teléfono:** {r['Teléfono'] or '—'}")
+                    st.markdown(f"**Web:** {r['Website'] or '—'}")
+                    st.markdown(f"**Redes:** {r['Redes'] or '—'}")
+                with cb:
+                    contacto = r["Contacto"] + (f" ({r['Cargo']})" if r["Cargo"] else "") if r["Contacto"] else "—"
+                    st.markdown(f"**Contacto:** {contacto}")
+                    st.markdown(f"**Dirección:** {r['Dirección'] or '—'}")
+                    st.markdown(f"**Servicios:** {r['Servicios'] or '—'}")
+                st.markdown("**Señales / Oportunidad:**")
+                st.write(r["Señales"] or "—")
+                if r["Notas"]:
+                    st.caption(r["Notas"])
 
     # ── Gráfico por provincia ─────────────────────────────────────────────────────
     if len(inv) > 0:
