@@ -4,10 +4,10 @@ import pandas as pd
 from datetime import datetime
 import time
 
-# âââ CONFIG âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+# Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ CONFIG Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 st.set_page_config(
-    page_title="AERTEC â Inteligencia CETA",
-    page_icon="âï¸",
+    page_title="AERTEC Ã¢ÂÂ Inteligencia CETA",
+    page_icon="Ã¢ÂÂÃ¯Â¸Â",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -20,14 +20,14 @@ WEBHOOK_URL    = st.secrets.get("WEBHOOK_URL", "https://abengole.app.n8n.cloud/w
 AT_URL = f"https://api.airtable.com/v0/{BASE_ID}/{TABLE_ID}"
 AT_HDR = {"Authorization": f"Bearer {AIRTABLE_TOKEN}", "Content-Type": "application/json"}
 
-# ââ HELPERS âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+# Ã¢ÂÂÃ¢ÂÂ HELPERS Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 def parse_confianza(notas: str) -> str:
     for linea in (notas or "").split("\n"):
         if linea.startswith("Confianza:"):
             return linea.replace("Confianza:", "").strip().split(" ")[0].lower()
     return ""
 
-@st.cache_data(ttl=60, show_spinner="Cargando empresas desde Airtableâ¦")
+@st.cache_data(ttl=60, show_spinner="Cargando empresas desde AirtableÃ¢ÂÂ¦")
 def cargar_todas():
     recs, offset = [], None
     while True:
@@ -40,25 +40,24 @@ def cargar_todas():
             f = rec["fields"]
             notas    = f.get("Notas Base Mercado", "")
             confianza = parse_confianza(notas)
-            senales  = f.get("SeÃ±ales / Oportunidad", "")
+            senales  = f.get("SeÃÂ±ales / Oportunidad", "")
             investigado = bool(f.get("Nombre Comercial") or senales)
             recs.append({
                 "id":             rec["id"],
-                "RazÃ³n Social":   f.get("RazÃ³n Social", ""),
+                "RazÃÂ³n Social":   f.get("RazÃÂ³n Social", ""),
                 "Nombre Comercial": f.get("Nombre Comercial", ""),
                 "Provincia":      f.get("Provincia", ""),
                 "Localidad":      f.get("Localidad", ""),
                 "Email":          f.get("Email", ""),
                 "Website":        f.get("Website", ""),
                 "IATA":           f.get("IATA", ""),
-                "SeÃ±ales":        senales,
+                "SeÃÂ±ales":        senales,
                 "Notas":          notas,
                 "Confianza":      confianza,
                 "En Cola":        bool(f.get("En Cola", False)),
                 "Servicios":      f.get("Servicios Destacados", ""),
-                "En Cola":        f.get("En Cola", False),
                 "Investigado":    investigado,
-                "Ãlt. Act.":      f.get("Ãlt. Act. Base", ""),
+                "ÃÂlt. Act.":      f.get("ÃÂlt. Act. Base", ""),
             })
         offset = data.get("offset")
         if not offset:
@@ -66,14 +65,14 @@ def cargar_todas():
     return pd.DataFrame(recs)
 
 def marcar_en_cola(ids: list, valor: bool):
-    """Actualiza el campo En Cola en Airtable (mÃ¡x 10 por request)."""
+    """Actualiza el campo En Cola en Airtable (mÃÂ¡x 10 por request)."""
     for i in range(0, len(ids), 10):
         chunk = ids[i:i+10]
         payload = {"records": [{"id": rid, "fields": {"En Cola": valor}} for rid in chunk]}
         requests.patch(AT_URL, headers=AT_HDR, json=payload)
 
 def disparar_webhook(modo: str, filtro_valor: str = "", limite: int = 50):
-    """Llama al webhook de n8n para iniciar el proceso de investigaciÃ³n."""
+    """Llama al webhook de n8n para iniciar el proceso de investigaciÃÂ³n."""
     payload = {
         "modo":         modo,
         "filtro_valor": filtro_valor.upper(),
@@ -86,7 +85,7 @@ def disparar_webhook(modo: str, filtro_valor: str = "", limite: int = 50):
     except Exception as e:
         return None, str(e)
 
-# âââ ESTILOS âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+# Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ ESTILOS Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 st.markdown("""
 <style>
 [data-testid="stMetric"] {
@@ -98,50 +97,50 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# âââ HEADER ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+# Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ HEADER Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 col_logo, col_title = st.columns([1, 5])
 with col_logo:
-    st.markdown("## âï¸")
+    st.markdown("## Ã¢ÂÂÃ¯Â¸Â")
 with col_title:
-    st.title("AERTEC â Inteligencia Comercial CETA")
-    st.caption(f"Datos actualizados hace menos de 1 minuto Â· {datetime.now().strftime('%d/%m/%Y %H:%M')}")
+    st.title("AERTEC Ã¢ÂÂ Inteligencia Comercial CETA")
+    st.caption(f"Datos actualizados hace menos de 1 minuto ÃÂ· {datetime.now().strftime('%d/%m/%Y %H:%M')}")
 
 df = cargar_todas()
 
-# âââ TABS ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-tab1, tab2 = st.tabs(["ð  Panel de Control", "ð  Dashboard de Resultados"])
+# Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ TABS Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+tab1, tab2 = st.tabs(["Ã°ÂÂÂ  Panel de Control", "Ã°ÂÂÂ  Dashboard de Resultados"])
 
 
-# ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-# TAB 1 â PANEL DE CONTROL
-# ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+# Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+# TAB 1 Ã¢ÂÂ PANEL DE CONTROL
+# Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 with tab1:
 
-    # ââ MÃ©tricas rÃ¡pidas âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+    # Ã¢ÂÂÃ¢ÂÂ MÃÂ©tricas rÃÂ¡pidas Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
     m1, m2, m3, m4 = st.columns(4)
-    en_cola  = int(df["En Cola"].sum())
-    sin_inv  = len(df[~df["Investigado"]])
-    inv_cnt  = len(df[df["Investigado"]])
+    en_cola  = int(df["En Cola"].sum()) if "En Cola" in df.columns else 0
+    sin_inv  = len(df[~df["Investigado"]]) if "Investigado" in df.columns else 0
+    inv_cnt  = len(df[df["Investigado"]]) if "Investigado" in df.columns else 0
     m1.metric("Total CETA",      len(df))
     m2.metric("Sin investigar",  sin_inv)
-    m3.metric("ð En Cola ahora", en_cola)
-    m4.metric("â Investigados",   inv_cnt)
+    m3.metric("Ã°ÂÂÂ En Cola ahora", en_cola)
+    m4.metric("Ã¢ÂÂ Investigados",   inv_cnt)
 
     st.divider()
 
-    # ââ Configurar disparo âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-    st.subheader("âï¸  Configurar proceso de investigaciÃ³n")
+    # Ã¢ÂÂÃ¢ÂÂ Configurar disparo Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+    st.subheader("Ã¢ÂÂÃ¯Â¸Â  Configurar proceso de investigaciÃÂ³n")
 
     MODOS = {
-        "ð  Cola â empresas marcadas En Cola":       "cola",
-        "ð  Todos â empresas sin email (pendientes)": "todos",
-        "ðºï¸   Provincia â filtrar por provincia":      "provincia",
-        "ð¬  Aeropuerto â filtrar por cÃ³digo IATA":   "aeropuerto",
+        "Ã°ÂÂÂ  Cola Ã¢ÂÂ empresas marcadas En Cola":       "cola",
+        "Ã°ÂÂÂ  Todos Ã¢ÂÂ empresas sin email (pendientes)": "todos",
+        "Ã°ÂÂÂºÃ¯Â¸Â   Provincia Ã¢ÂÂ filtrar por provincia":      "provincia",
+        "Ã°ÂÂÂ¬  Aeropuerto Ã¢ÂÂ filtrar por cÃÂ³digo IATA":   "aeropuerto",
     }
 
     col_m, col_v, col_l = st.columns([3, 3, 2])
     with col_m:
-        modo_label = st.selectbox("Modo de operaciÃ³n", list(MODOS.keys()))
+        modo_label = st.selectbox("Modo de operaciÃÂ³n", list(MODOS.keys()))
         modo_key   = MODOS[modo_label]
 
     with col_v:
@@ -151,45 +150,45 @@ with tab1:
             filtro_val = st.selectbox("Provincia", provs if provs else ["Buenos Aires"])
         elif modo_key == "aeropuerto":
             iatas = sorted(df["IATA"].dropna().replace("", pd.NA).dropna().unique().tolist())
-            filtro_val = st.selectbox("CÃ³digo IATA", iatas if iatas else ["SABE","SACO","SARC"])
+            filtro_val = st.selectbox("CÃÂ³digo IATA", iatas if iatas else ["SABE","SACO","SARC"])
         else:
             st.empty()
 
     with col_l:
-        limite = st.number_input("LÃ­mite de empresas", min_value=1, max_value=628, value=30, step=10)
+        limite = st.number_input("LÃÂ­mite de empresas", min_value=1, max_value=628, value=30, step=10)
 
-    # ââ Contexto del modo seleccionado âââââââââââââââââââââââââââââââââââââââââââ
+    # Ã¢ÂÂÃ¢ÂÂ Contexto del modo seleccionado Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
     if modo_key == "cola":
-        st.info(f"ð Se procesarÃ¡n las **{en_cola}** empresas actualmente marcadas como *En Cola*.")
+        st.info(f"Ã°ÂÂÂ Se procesarÃÂ¡n las **{en_cola}** empresas actualmente marcadas como *En Cola*.")
     elif modo_key == "todos":
-        st.info(f"ð Se procesarÃ¡n hasta **{limite}** empresas sin email registrado (en orden Airtable).")
+        st.info(f"Ã°ÂÂÂ Se procesarÃÂ¡n hasta **{limite}** empresas sin email registrado (en orden Airtable).")
     elif modo_key == "provincia":
         cnt   = len(df[df["Provincia"] == filtro_val])
         cnt_s = len(df[(df["Provincia"] == filtro_val) & ~df["Investigado"]])
-        st.info(f"ðºï¸ **{filtro_val}**: {cnt} empresas totales, {cnt_s} sin investigar.")
+        st.info(f"Ã°ÂÂÂºÃ¯Â¸Â **{filtro_val}**: {cnt} empresas totales, {cnt_s} sin investigar.")
     elif modo_key == "aeropuerto":
         cnt = len(df[df["IATA"] == filtro_val])
-        st.info(f"ð¬ **{filtro_val}**: {cnt} empresas registradas en ese aeropuerto.")
+        st.info(f"Ã°ÂÂÂ¬ **{filtro_val}**: {cnt} empresas registradas en ese aeropuerto.")
 
-    # ââ BotÃ³n principal ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+    # Ã¢ÂÂÃ¢ÂÂ BotÃÂ³n principal Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
     col_btn, _ = st.columns([2, 5])
     with col_btn:
-        if st.button("ð  Iniciar investigaciÃ³n", type="primary", use_container_width=True):
+        if st.button("Ã°ÂÂÂ  Iniciar investigaciÃÂ³n", type="primary", use_container_width=True):
             if modo_key == "cola" and en_cola == 0:
-                st.warning("No hay empresas En Cola. SeleccionÃ¡ empresas abajo y marcalas primero.")
+                st.warning("No hay empresas En Cola. SeleccionÃÂ¡ empresas abajo y marcalas primero.")
             else:
-                with st.spinner("Enviando solicitud a n8nâ¦"):
+                with st.spinner("Enviando solicitud a n8nÃ¢ÂÂ¦"):
                     status, resp = disparar_webhook(modo_key, filtro_val, limite)
                 if status and status < 300:
-                    st.success(f"â Proceso iniciado â modo **{modo_key}**, lÃ­mite **{limite}** Â· n8n: {resp}")
+                    st.success(f"Ã¢ÂÂ Proceso iniciado Ã¢ÂÂ modo **{modo_key}**, lÃÂ­mite **{limite}** ÃÂ· n8n: {resp}")
                 else:
-                    st.error(f"â Error {status}: {resp}")
+                    st.error(f"Ã¢ÂÂ Error {status}: {resp}")
 
     st.divider()
 
-    # ââ GestiÃ³n manual de la cola ââââââââââââââââââââââââââââââââââââââââââââââââ
-    st.subheader("ð  Gestionar cola manualmente")
-    st.caption("BuscÃ¡, filtrÃ¡ y marcÃ¡ empresas especÃ­ficas para agregar o quitar de la cola.")
+    # Ã¢ÂÂÃ¢ÂÂ GestiÃÂ³n manual de la cola Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+    st.subheader("Ã°ÂÂÂ  Gestionar cola manualmente")
+    st.caption("BuscÃÂ¡, filtrÃÂ¡ y marcÃÂ¡ empresas especÃÂ­ficas para agregar o quitar de la cola.")
 
     cf1, cf2, cf3 = st.columns(3)
     with cf1:
@@ -201,7 +200,7 @@ with tab1:
             "Estado", ["Todos", "Sin investigar", "Investigados", "En Cola"], key="ctrl_est"
         )
     with cf3:
-        busq = st.text_input("ð Buscar razÃ³n social", placeholder="ej: SLA, Aeroâ¦", key="ctrl_busq")
+        busq = st.text_input("Ã°ÂÂÂ Buscar razÃÂ³n social", placeholder="ej: SLA, AeroÃ¢ÂÂ¦", key="ctrl_busq")
 
     df_ctrl = df.copy()
     if prov_f != "Todas":
@@ -213,24 +212,24 @@ with tab1:
     elif estado_f == "En Cola":
         df_ctrl = df_ctrl[df_ctrl["En Cola"]]
     if busq:
-        df_ctrl = df_ctrl[df_ctrl["RazÃ³n Social"].str.contains(busq, case=False, na=False)]
+        df_ctrl = df_ctrl[df_ctrl["RazÃÂ³n Social"].str.contains(busq, case=False, na=False)]
 
     st.caption(f"{len(df_ctrl)} empresas")
 
-    df_show = df_ctrl[["RazÃ³n Social","Provincia","Localidad","Investigado","En Cola"]]\
+    df_show = df_ctrl[["RazÃÂ³n Social","Provincia","Localidad","Investigado","En Cola"]]\
         .assign(Seleccionar=False).reset_index(drop=True)
 
     sel = st.data_editor(
         df_show,
         column_config={
-            "Seleccionar":  st.column_config.CheckboxColumn("â Sel.", width="small"),
-            "Investigado":  st.column_config.CheckboxColumn("â Inv.", width="small"),
-            "En Cola":      st.column_config.CheckboxColumn("ð Cola", width="small"),
+            "Seleccionar":  st.column_config.CheckboxColumn("Ã¢ÂÂ Sel.", width="small"),
+            "Investigado":  st.column_config.CheckboxColumn("Ã¢ÂÂ Inv.", width="small"),
+            "En Cola":      st.column_config.CheckboxColumn("Ã°ÂÂÂ Cola", width="small"),
         },
         hide_index=True,
         use_container_width=True,
         key="editor_ctrl",
-        disabled=["RazÃ³n Social","Provincia","Localidad","Investigado","En Cola"],
+        disabled=["RazÃÂ³n Social","Provincia","Localidad","Investigado","En Cola"],
     )
 
     ids_sel = df_ctrl.iloc[sel[sel["Seleccionar"]].index]["id"].tolist()
@@ -238,14 +237,14 @@ with tab1:
 
     ca, cb, _ = st.columns([2, 2, 4])
     with ca:
-        if st.button(f"â  Agregar a Cola ({n_sel})", disabled=not ids_sel, use_container_width=True):
+        if st.button(f"Ã¢ÂÂ  Agregar a Cola ({n_sel})", disabled=not ids_sel, use_container_width=True):
             marcar_en_cola(ids_sel, True)
             cargar_todas.clear()
-            st.success(f"{n_sel} empresas â En Cola â")
+            st.success(f"{n_sel} empresas Ã¢ÂÂ En Cola Ã¢ÂÂ")
             time.sleep(0.5)
             st.rerun()
     with cb:
-        if st.button(f"â  Quitar de Cola ({n_sel})", disabled=not ids_sel, use_container_width=True):
+        if st.button(f"Ã¢ÂÂ  Quitar de Cola ({n_sel})", disabled=not ids_sel, use_container_width=True):
             marcar_en_cola(ids_sel, False)
             cargar_todas.clear()
             st.success(f"{n_sel} empresas quitadas de cola")
@@ -253,9 +252,9 @@ with tab1:
             st.rerun()
 
 
-# ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-# TAB 2 â DASHBOARD
-# ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+# Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+# TAB 2 Ã¢ÂÂ DASHBOARD
+# Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 with tab2:
 
     inv  = df[df["Investigado"]]
@@ -264,15 +263,15 @@ with tab2:
     baja = len(inv[inv["Confianza"] == "baja"])
     sd   = len(inv[inv["Confianza"] == ""])
 
-    # ââ MÃ©tricas âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+    # Ã¢ÂÂÃ¢ÂÂ MÃÂ©tricas Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
     c1, c2, c3, c4, c5 = st.columns(5)
     c1.metric("Total CETA",       len(df))
     c2.metric("Investigados",      len(inv), f"{100*len(inv)//max(len(df),1)}%")
-    c3.metric("ð¢ Alta confianza", alta)
-    c4.metric("ð¡ Media",          media)
-    c5.metric("â« Baja / s/d",     baja + sd)
+    c3.metric("Ã°ÂÂÂ¢ Alta confianza", alta)
+    c4.metric("Ã°ÂÂÂ¡ Media",          media)
+    c5.metric("Ã¢ÂÂ« Baja / s/d",     baja + sd)
 
-    # ââ GrÃ¡fico por provincia âââââââââââââââââââââââââââââââââââââââââââââââââââââ
+    # Ã¢ÂÂÃ¢ÂÂ GrÃÂ¡fico por provincia Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
     if len(inv) > 0:
         st.divider()
         st.caption("Investigados por provincia (top 12)")
@@ -286,7 +285,7 @@ with tab2:
 
     st.divider()
 
-    # ââ Filtros âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+    # Ã¢ÂÂÃ¢ÂÂ Filtros Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
     df1, df2, df3 = st.columns(3)
     with df1:
         prov_d = st.selectbox(
@@ -311,26 +310,26 @@ with tab2:
 
     st.dataframe(
         df_dash[[
-            "RazÃ³n Social","Nombre Comercial","Provincia","Localidad",
-            "Confianza","Email","Website","SeÃ±ales","Servicios","Ãlt. Act."
+            "RazÃÂ³n Social","Nombre Comercial","Provincia","Localidad",
+            "Confianza","Email","Website","SeÃÂ±ales","Servicios","ÃÂlt. Act."
         ]].reset_index(drop=True),
         use_container_width=True,
         hide_index=True,
         column_config={
             "Website":  st.column_config.LinkColumn("Website", width="small"),
-            "SeÃ±ales":  st.column_config.TextColumn("SeÃ±ales / Oportunidad", width="large"),
+            "SeÃÂ±ales":  st.column_config.TextColumn("SeÃÂ±ales / Oportunidad", width="large"),
             "Servicios":st.column_config.TextColumn("Servicios", width="medium"),
             "Confianza":st.column_config.TextColumn("Conf.", width="small"),
         },
     )
 
-    # ââ Exportar ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+    # Ã¢ÂÂÃ¢ÂÂ Exportar Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
     col_exp, col_ref = st.columns([2, 6])
     with col_exp:
         ts  = datetime.now().strftime("%Y%m%d_%H%M")
         csv = df_dash.drop(columns=["id"]).to_csv(index=False).encode("utf-8")
-        st.download_button("â¬ï¸  Exportar CSV", csv, f"ceta_{ts}.csv", "text/csv", use_container_width=True)
+        st.download_button("Ã¢Â¬ÂÃ¯Â¸Â  Exportar CSV", csv, f"ceta_{ts}.csv", "text/csv", use_container_width=True)
     with col_ref:
-        if st.button("ð  Actualizar datos", use_container_width=False):
+        if st.button("Ã°ÂÂÂ  Actualizar datos", use_container_width=False):
             cargar_todas.clear()
             st.rerun()
