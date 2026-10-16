@@ -4,10 +4,10 @@ import pandas as pd
 from datetime import datetime
 import time
 
-# ─── CONFIG ─────────────────────────────────────────────────────────────────────
+# âââ CONFIG âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 st.set_page_config(
-    page_title="AERTEC — Inteligencia CETA",
-    page_icon="✈️",
+    page_title="AERTEC â Inteligencia CETA",
+    page_icon="âï¸",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -20,14 +20,14 @@ WEBHOOK_URL    = st.secrets.get("WEBHOOK_URL", "https://abengole.app.n8n.cloud/w
 AT_URL = f"https://api.airtable.com/v0/{BASE_ID}/{TABLE_ID}"
 AT_HDR = {"Authorization": f"Bearer {AIRTABLE_TOKEN}", "Content-Type": "application/json"}
 
-# ── HELPERS ─────────────────────────────────────────────────────────────────────
+# ââ HELPERS âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 def parse_confianza(notas: str) -> str:
     for linea in (notas or "").split("\n"):
         if linea.startswith("Confianza:"):
             return linea.replace("Confianza:", "").strip().split(" ")[0].lower()
     return ""
 
-@st.cache_data(ttl=60, show_spinner="Cargando empresas desde Airtable…")
+@st.cache_data(ttl=60, show_spinner="Cargando empresas desde Airtableâ¦")
 def cargar_todas():
     recs, offset = [], None
     while True:
@@ -40,24 +40,25 @@ def cargar_todas():
             f = rec["fields"]
             notas    = f.get("Notas Base Mercado", "")
             confianza = parse_confianza(notas)
-            senales  = f.get("Señales / Oportunidad", "")
+            senales  = f.get("SeÃ±ales / Oportunidad", "")
             investigado = bool(f.get("Nombre Comercial") or senales)
             recs.append({
                 "id":             rec["id"],
-                "Razón Social":   f.get("Razón Social", ""),
+                "RazÃ³n Social":   f.get("RazÃ³n Social", ""),
                 "Nombre Comercial": f.get("Nombre Comercial", ""),
                 "Provincia":      f.get("Provincia", ""),
                 "Localidad":      f.get("Localidad", ""),
                 "Email":          f.get("Email", ""),
                 "Website":        f.get("Website", ""),
                 "IATA":           f.get("IATA", ""),
-                "Señales":        senales,
+                "SeÃ±ales":        senales,
                 "Notas":          notas,
                 "Confianza":      confianza,
                 "En Cola":        bool(f.get("En Cola", False)),
                 "Servicios":      f.get("Servicios Destacados", ""),
+                "En Cola":        f.get("En Cola", False),
                 "Investigado":    investigado,
-                "Últ. Act.":      f.get("Últ. Act. Base", ""),
+                "Ãlt. Act.":      f.get("Ãlt. Act. Base", ""),
             })
         offset = data.get("offset")
         if not offset:
@@ -65,14 +66,14 @@ def cargar_todas():
     return pd.DataFrame(recs)
 
 def marcar_en_cola(ids: list, valor: bool):
-    """Actualiza el campo En Cola en Airtable (máx 10 por request)."""
+    """Actualiza el campo En Cola en Airtable (mÃ¡x 10 por request)."""
     for i in range(0, len(ids), 10):
         chunk = ids[i:i+10]
         payload = {"records": [{"id": rid, "fields": {"En Cola": valor}} for rid in chunk]}
         requests.patch(AT_URL, headers=AT_HDR, json=payload)
 
 def disparar_webhook(modo: str, filtro_valor: str = "", limite: int = 50):
-    """Llama al webhook de n8n para iniciar el proceso de investigación."""
+    """Llama al webhook de n8n para iniciar el proceso de investigaciÃ³n."""
     payload = {
         "modo":         modo,
         "filtro_valor": filtro_valor.upper(),
@@ -85,7 +86,7 @@ def disparar_webhook(modo: str, filtro_valor: str = "", limite: int = 50):
     except Exception as e:
         return None, str(e)
 
-# ─── ESTILOS ─────────────────────────────────────────────────────────────────────
+# âââ ESTILOS âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 st.markdown("""
 <style>
 [data-testid="stMetric"] {
@@ -97,50 +98,50 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ─── HEADER ──────────────────────────────────────────────────────────────────────
+# âââ HEADER ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 col_logo, col_title = st.columns([1, 5])
 with col_logo:
-    st.markdown("## ✈️")
+    st.markdown("## âï¸")
 with col_title:
-    st.title("AERTEC — Inteligencia Comercial CETA")
-    st.caption(f"Datos actualizados hace menos de 1 minuto · {datetime.now().strftime('%d/%m/%Y %H:%M')}")
+    st.title("AERTEC â Inteligencia Comercial CETA")
+    st.caption(f"Datos actualizados hace menos de 1 minuto Â· {datetime.now().strftime('%d/%m/%Y %H:%M')}")
 
 df = cargar_todas()
 
-# ─── TABS ────────────────────────────────────────────────────────────────────────
-tab1, tab2 = st.tabs(["🚀  Panel de Control", "📊  Dashboard de Resultados"])
+# âââ TABS ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+tab1, tab2 = st.tabs(["ð  Panel de Control", "ð  Dashboard de Resultados"])
 
 
-# ══════════════════════════════════════════════════════════════════════════════════
-# TAB 1 — PANEL DE CONTROL
-# ══════════════════════════════════════════════════════════════════════════════════
+# ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+# TAB 1 â PANEL DE CONTROL
+# ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 with tab1:
 
-    # ── Métricas rápidas ─────────────────────────────────────────────────────────
+    # ââ MÃ©tricas rÃ¡pidas âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
     m1, m2, m3, m4 = st.columns(4)
     en_cola  = int(df["En Cola"].sum())
     sin_inv  = len(df[~df["Investigado"]])
     inv_cnt  = len(df[df["Investigado"]])
     m1.metric("Total CETA",      len(df))
     m2.metric("Sin investigar",  sin_inv)
-    m3.metric("🔄 En Cola ahora", en_cola)
-    m4.metric("✅ Investigados",   inv_cnt)
+    m3.metric("ð En Cola ahora", en_cola)
+    m4.metric("â Investigados",   inv_cnt)
 
     st.divider()
 
-    # ── Configurar disparo ───────────────────────────────────────────────────────
-    st.subheader("⚙️  Configurar proceso de investigación")
+    # ââ Configurar disparo âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+    st.subheader("âï¸  Configurar proceso de investigaciÃ³n")
 
     MODOS = {
-        "🔄  Cola — empresas marcadas En Cola":       "cola",
-        "📋  Todos — empresas sin email (pendientes)": "todos",
-        "🗺️   Provincia — filtrar por provincia":      "provincia",
-        "🛬  Aeropuerto — filtrar por código IATA":   "aeropuerto",
+        "ð  Cola â empresas marcadas En Cola":       "cola",
+        "ð  Todos â empresas sin email (pendientes)": "todos",
+        "ðºï¸   Provincia â filtrar por provincia":      "provincia",
+        "ð¬  Aeropuerto â filtrar por cÃ³digo IATA":   "aeropuerto",
     }
 
     col_m, col_v, col_l = st.columns([3, 3, 2])
     with col_m:
-        modo_label = st.selectbox("Modo de operación", list(MODOS.keys()))
+        modo_label = st.selectbox("Modo de operaciÃ³n", list(MODOS.keys()))
         modo_key   = MODOS[modo_label]
 
     with col_v:
@@ -150,45 +151,45 @@ with tab1:
             filtro_val = st.selectbox("Provincia", provs if provs else ["Buenos Aires"])
         elif modo_key == "aeropuerto":
             iatas = sorted(df["IATA"].dropna().replace("", pd.NA).dropna().unique().tolist())
-            filtro_val = st.selectbox("Código IATA", iatas if iatas else ["SABE","SACO","SARC"])
+            filtro_val = st.selectbox("CÃ³digo IATA", iatas if iatas else ["SABE","SACO","SARC"])
         else:
             st.empty()
 
     with col_l:
-        limite = st.number_input("Límite de empresas", min_value=1, max_value=628, value=30, step=10)
+        limite = st.number_input("LÃ­mite de empresas", min_value=1, max_value=628, value=30, step=10)
 
-    # ── Contexto del modo seleccionado ───────────────────────────────────────────
+    # ââ Contexto del modo seleccionado âââââââââââââââââââââââââââââââââââââââââââ
     if modo_key == "cola":
-        st.info(f"🔄 Se procesarán las **{en_cola}** empresas actualmente marcadas como *En Cola*.")
+        st.info(f"ð Se procesarÃ¡n las **{en_cola}** empresas actualmente marcadas como *En Cola*.")
     elif modo_key == "todos":
-        st.info(f"📋 Se procesarán hasta **{limite}** empresas sin email registrado (en orden Airtable).")
+        st.info(f"ð Se procesarÃ¡n hasta **{limite}** empresas sin email registrado (en orden Airtable).")
     elif modo_key == "provincia":
         cnt   = len(df[df["Provincia"] == filtro_val])
         cnt_s = len(df[(df["Provincia"] == filtro_val) & ~df["Investigado"]])
-        st.info(f"🗺️ **{filtro_val}**: {cnt} empresas totales, {cnt_s} sin investigar.")
+        st.info(f"ðºï¸ **{filtro_val}**: {cnt} empresas totales, {cnt_s} sin investigar.")
     elif modo_key == "aeropuerto":
         cnt = len(df[df["IATA"] == filtro_val])
-        st.info(f"🛬 **{filtro_val}**: {cnt} empresas registradas en ese aeropuerto.")
+        st.info(f"ð¬ **{filtro_val}**: {cnt} empresas registradas en ese aeropuerto.")
 
-    # ── Botón principal ──────────────────────────────────────────────────────────
+    # ââ BotÃ³n principal ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
     col_btn, _ = st.columns([2, 5])
     with col_btn:
-        if st.button("🚀  Iniciar investigación", type="primary", use_container_width=True):
+        if st.button("ð  Iniciar investigaciÃ³n", type="primary", use_container_width=True):
             if modo_key == "cola" and en_cola == 0:
-                st.warning("No hay empresas En Cola. Seleccioná empresas abajo y marcalas primero.")
+                st.warning("No hay empresas En Cola. SeleccionÃ¡ empresas abajo y marcalas primero.")
             else:
-                with st.spinner("Enviando solicitud a n8n…"):
+                with st.spinner("Enviando solicitud a n8nâ¦"):
                     status, resp = disparar_webhook(modo_key, filtro_val, limite)
                 if status and status < 300:
-                    st.success(f"✅ Proceso iniciado — modo **{modo_key}**, límite **{limite}** · n8n: {resp}")
+                    st.success(f"â Proceso iniciado â modo **{modo_key}**, lÃ­mite **{limite}** Â· n8n: {resp}")
                 else:
-                    st.error(f"❌ Error {status}: {resp}")
+                    st.error(f"â Error {status}: {resp}")
 
     st.divider()
 
-    # ── Gestión manual de la cola ────────────────────────────────────────────────
-    st.subheader("📋  Gestionar cola manualmente")
-    st.caption("Buscá, filtrá y marcá empresas específicas para agregar o quitar de la cola.")
+    # ââ GestiÃ³n manual de la cola ââââââââââââââââââââââââââââââââââââââââââââââââ
+    st.subheader("ð  Gestionar cola manualmente")
+    st.caption("BuscÃ¡, filtrÃ¡ y marcÃ¡ empresas especÃ­ficas para agregar o quitar de la cola.")
 
     cf1, cf2, cf3 = st.columns(3)
     with cf1:
@@ -200,7 +201,7 @@ with tab1:
             "Estado", ["Todos", "Sin investigar", "Investigados", "En Cola"], key="ctrl_est"
         )
     with cf3:
-        busq = st.text_input("🔍 Buscar razón social", placeholder="ej: SLA, Aero…", key="ctrl_busq")
+        busq = st.text_input("ð Buscar razÃ³n social", placeholder="ej: SLA, Aeroâ¦", key="ctrl_busq")
 
     df_ctrl = df.copy()
     if prov_f != "Todas":
@@ -212,24 +213,24 @@ with tab1:
     elif estado_f == "En Cola":
         df_ctrl = df_ctrl[df_ctrl["En Cola"]]
     if busq:
-        df_ctrl = df_ctrl[df_ctrl["Razón Social"].str.contains(busq, case=False, na=False)]
+        df_ctrl = df_ctrl[df_ctrl["RazÃ³n Social"].str.contains(busq, case=False, na=False)]
 
     st.caption(f"{len(df_ctrl)} empresas")
 
-    df_show = df_ctrl[["Razón Social","Provincia","Localidad","Investigado","En Cola"]]\
+    df_show = df_ctrl[["RazÃ³n Social","Provincia","Localidad","Investigado","En Cola"]]\
         .assign(Seleccionar=False).reset_index(drop=True)
 
     sel = st.data_editor(
         df_show,
         column_config={
-            "Seleccionar":  st.column_config.CheckboxColumn("✔ Sel.", width="small"),
-            "Investigado":  st.column_config.CheckboxColumn("✅ Inv.", width="small"),
-            "En Cola":      st.column_config.CheckboxColumn("🔄 Cola", width="small"),
+            "Seleccionar":  st.column_config.CheckboxColumn("â Sel.", width="small"),
+            "Investigado":  st.column_config.CheckboxColumn("â Inv.", width="small"),
+            "En Cola":      st.column_config.CheckboxColumn("ð Cola", width="small"),
         },
         hide_index=True,
         use_container_width=True,
         key="editor_ctrl",
-        disabled=["Razón Social","Provincia","Localidad","Investigado","En Cola"],
+        disabled=["RazÃ³n Social","Provincia","Localidad","Investigado","En Cola"],
     )
 
     ids_sel = df_ctrl.iloc[sel[sel["Seleccionar"]].index]["id"].tolist()
@@ -237,14 +238,14 @@ with tab1:
 
     ca, cb, _ = st.columns([2, 2, 4])
     with ca:
-        if st.button(f"✅  Agregar a Cola ({n_sel})", disabled=not ids_sel, use_container_width=True):
+        if st.button(f"â  Agregar a Cola ({n_sel})", disabled=not ids_sel, use_container_width=True):
             marcar_en_cola(ids_sel, True)
             cargar_todas.clear()
-            st.success(f"{n_sel} empresas → En Cola ✅")
+            st.success(f"{n_sel} empresas â En Cola â")
             time.sleep(0.5)
             st.rerun()
     with cb:
-        if st.button(f"❌  Quitar de Cola ({n_sel})", disabled=not ids_sel, use_container_width=True):
+        if st.button(f"â  Quitar de Cola ({n_sel})", disabled=not ids_sel, use_container_width=True):
             marcar_en_cola(ids_sel, False)
             cargar_todas.clear()
             st.success(f"{n_sel} empresas quitadas de cola")
@@ -252,9 +253,9 @@ with tab1:
             st.rerun()
 
 
-# ══════════════════════════════════════════════════════════════════════════════════
-# TAB 2 — DASHBOARD
-# ══════════════════════════════════════════════════════════════════════════════════
+# ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+# TAB 2 â DASHBOARD
+# ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 with tab2:
 
     inv  = df[df["Investigado"]]
@@ -263,15 +264,15 @@ with tab2:
     baja = len(inv[inv["Confianza"] == "baja"])
     sd   = len(inv[inv["Confianza"] == ""])
 
-    # ── Métricas ─────────────────────────────────────────────────────────────────
+    # ââ MÃ©tricas âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
     c1, c2, c3, c4, c5 = st.columns(5)
     c1.metric("Total CETA",       len(df))
     c2.metric("Investigados",      len(inv), f"{100*len(inv)//max(len(df),1)}%")
-    c3.metric("🟢 Alta confianza", alta)
-    c4.metric("🟡 Media",          media)
-    c5.metric("⚫ Baja / s/d",     baja + sd)
+    c3.metric("ð¢ Alta confianza", alta)
+    c4.metric("ð¡ Media",          media)
+    c5.metric("â« Baja / s/d",     baja + sd)
 
-    # ── Gráfico por provincia ─────────────────────────────────────────────────────
+    # ââ GrÃ¡fico por provincia âââââââââââââââââââââââââââââââââââââââââââââââââââââ
     if len(inv) > 0:
         st.divider()
         st.caption("Investigados por provincia (top 12)")
@@ -285,7 +286,7 @@ with tab2:
 
     st.divider()
 
-    # ── Filtros ───────────────────────────────────────────────────────────────────
+    # ââ Filtros âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
     df1, df2, df3 = st.columns(3)
     with df1:
         prov_d = st.selectbox(
@@ -310,26 +311,26 @@ with tab2:
 
     st.dataframe(
         df_dash[[
-            "Razón Social","Nombre Comercial","Provincia","Localidad",
-            "Confianza","Email","Website","Señales","Servicios","Últ. Act."
+            "RazÃ³n Social","Nombre Comercial","Provincia","Localidad",
+            "Confianza","Email","Website","SeÃ±ales","Servicios","Ãlt. Act."
         ]].reset_index(drop=True),
         use_container_width=True,
         hide_index=True,
         column_config={
             "Website":  st.column_config.LinkColumn("Website", width="small"),
-            "Señales":  st.column_config.TextColumn("Señales / Oportunidad", width="large"),
+            "SeÃ±ales":  st.column_config.TextColumn("SeÃ±ales / Oportunidad", width="large"),
             "Servicios":st.column_config.TextColumn("Servicios", width="medium"),
             "Confianza":st.column_config.TextColumn("Conf.", width="small"),
         },
     )
 
-    # ── Exportar ──────────────────────────────────────────────────────────────────
+    # ââ Exportar ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
     col_exp, col_ref = st.columns([2, 6])
     with col_exp:
         ts  = datetime.now().strftime("%Y%m%d_%H%M")
         csv = df_dash.drop(columns=["id"]).to_csv(index=False).encode("utf-8")
-        st.download_button("⬇️  Exportar CSV", csv, f"ceta_{ts}.csv", "text/csv", use_container_width=True)
+        st.download_button("â¬ï¸  Exportar CSV", csv, f"ceta_{ts}.csv", "text/csv", use_container_width=True)
     with col_ref:
-        if st.button("🔄  Actualizar datos", use_container_width=False):
+        if st.button("ð  Actualizar datos", use_container_width=False):
             cargar_todas.clear()
             st.rerun()
