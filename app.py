@@ -16,6 +16,9 @@ AIRTABLE_TOKEN = st.secrets["AIRTABLE_TOKEN"]
 BASE_ID        = st.secrets.get("BASE_ID",     "appn6Aq6TDGYIEFns")
 TABLE_ID       = st.secrets.get("TABLE_ID",    "tbleTsyCIWB9yRTtp")
 WEBHOOK_URL    = st.secrets.get("WEBHOOK_URL", "https://abengole.app.n8n.cloud/webhook/ceta-investigar")
+DISCOVER_URL   = st.secrets.get("DISCOVER_URL", "https://abengole.app.n8n.cloud/webhook/ceta-descubrir")
+SEGMENTOS      = ["Operador Aéreo", "Trabajo Aéreo", "Taller de Mantenimiento", "Servicios en Tierra"]
+MAX_LUGARES    = 5
 
 AT_URL = f"https://api.airtable.com/v0/{BASE_ID}/{TABLE_ID}"
 AT_HDR = {"Authorization": f"Bearer {AIRTABLE_TOKEN}", "Content-Type": "application/json"}
@@ -26,6 +29,13 @@ def parse_confianza(notas: str) -> str:
         if linea.startswith("Confianza:"):
             return linea.replace("Confianza:", "").strip().split(" ")[0].lower()
     return ""
+
+COLUMNAS = [
+    "id", "Razón Social", "Nombre Comercial", "Provincia", "Localidad", "Email", "Website", "IATA",
+    "Señales", "Notas", "Confianza", "En Cola", "Servicios", "Investigado", "Últ. Act.", "Teléfono",
+    "Contacto", "Cargo", "Dirección", "Redes", "Segmento", "Aeropuerto", "Fecha desc.",
+    "Estado revisión", "Fuente desc.",
+]
 
 @st.cache_data(ttl=60, show_spinner="Cargando empresas desde Airtable…")
 def cargar_todas():
@@ -63,11 +73,16 @@ def cargar_todas():
                 "Cargo":          f.get("Cargo", ""),
                 "Dirección":      f.get("Dirección", ""),
                 "Redes":          f.get("Redes / IG", ""),
+                "Segmento":       f.get("Segmento", ""),
+                "Aeropuerto":     f.get("Aeropuerto de Acceso", ""),
+                "Fecha desc.":    f.get("Fecha descubrimiento", ""),
+                "Estado revisión": f.get("Estado revisión", ""),
+                "Fuente desc.":   f.get("Fuente descubrimiento", ""),
             })
         offset = data.get("offset")
         if not offset:
             break
-    return pd.DataFrame(recs)
+    return pd.DataFrame(recs, columns=COLUMNAS)
 
 def marcar_en_cola(ids: list, valor: bool):
     """Actualiza el campo En Cola en Airtable (máx 10 por request)."""
@@ -75,6 +90,26 @@ def marcar_en_cola(ids: list, valor: bool):
         chunk = ids[i:i+10]
         payload = {"records": [{"id": rid, "fields": {"En Cola": valor}} for rid in chunk]}
         requests.patch(AT_URL, headers=AT_HDR, json=payload)
+
+def actualizar_campos(ids: list, campos: dict):
+    """Actualiza campos en Airtable (máx 10 por request). Devuelve cantidad de errores."""
+    errores = 0
+    for i in range(0, len(ids), 10):
+        chunk = ids[i:i+10]
+        payload = {"typecast": True, "records": [{"id": rid, "fields": campos} for rid in chunk]}
+        r = requests.patch(AT_URL, headers=AT_HDR, json=payload)
+        if r.status_code >= 300:
+            errores += len(chunk)
+    return errores
+
+def disparar_descubrimiento(lugares: list, categorias: list, limite: int):
+    """Llama al webhook de n8n que busca empresas nuevas en la web."""
+    payload = {"lugares": lugares, "categorias": categorias, "limite": limite}
+    try:
+        r = requests.post(DISCOVER_URL, json=payload, timeout=20)
+        return r.status_code, r.text
+    except Exception as e:
+        return None, str(e)
 
 def disparar_webhook(modo: str, filtro_valor: str = "", limite: int = 50):
     """Llama al webhook de n8n para iniciar el proceso de investigación."""
@@ -110,10 +145,17 @@ with col_title:
     st.title("AERTEC — Inteligencia Comercial CETA")
     st.caption(f"Datos actualizados hace menos de 1 minuto · {datetime.now().strftime('%d/%m/%Y %H:%M')}")
 
-df = cargar_todas()
+df_all = cargar_todas()
+
+# Empresas descubiertas por el flujo nuevo (tienen Fecha descubrimiento).
+# Pendientes y Descartadas quedan aparte; las Aprobadas entran al circuito CETA normal.
+_fecha = df_all["Fecha desc."].astype(str).str.strip()
+_desc  = _fecha != ""
+df_desc = df_all[_desc].reset_index(drop=True)
+df = df_all[~_desc | (df_all["Estado revisión"] == "Aprobada")].reset_index(drop=True)
 
 # ─── TABS ────────────────────────────────────────────────────────────────────────
-tab1, tab2 = st.tabs(["🚀  Panel de Control", "📊  Dashboard de Resultados"])
+tab1, tab2, tab3 = st.tabs(["🚀  Panel de Control", "📊  Dashboard de Resultados", "🔎  Descubrir empresas"])
 
 
 # ══════════════════════════════════════════════════════════════════════════════════
@@ -123,7 +165,7 @@ with tab1:
 
     # ── Métricas rápidas ─────────────────────────────────────────────────────────
     m1, m2, m3, m4 = st.columns(4)
-    en_cola  = int(df["En Cola"].sum()) if "En Cola" in df.columns else 0
+    en_cola  = int(df_all["En Cola"].sum())
     sin_inv  = len(df[~df["Investigado"]]) if "Investigado" in df.columns else 0
     inv_cnt  = len(df[df["Investigado"]]) if "Investigado" in df.columns else 0
     m1.metric("Total CETA",      len(df))
@@ -385,3 +427,157 @@ with tab2:
         if st.button("🔄  Actualizar datos", use_container_width=False):
             cargar_todas.clear()
             st.rerun()
+
+
+# ══════════════════════════════════════════════════════════════════════════════════
+# TAB 3 — DESCUBRIR EMPRESAS NUEVAS
+# ══════════════════════════════════════════════════════════════════════════════════
+with tab3:
+
+    pend_df = df_desc[df_desc["Estado revisión"] == "Pendiente"]
+    apro_df = df_desc[df_desc["Estado revisión"] == "Aprobada"]
+    desc_df = df_desc[df_desc["Estado revisión"] == "Descartada"]
+
+    d1, d2, d3, d4 = st.columns(4)
+    d1.metric("🕓 Pendientes de revisión", len(pend_df))
+    d2.metric("✅ Aprobadas", len(apro_df))
+    d3.metric("🗑️ Descartadas", len(desc_df))
+    d4.metric("Descubiertas en total", len(df_desc))
+
+    st.divider()
+    st.subheader("🔎  Buscar empresas nuevas")
+    st.caption(
+        "Busca en la web empresas que todavía no están en Airtable. Solo se cargan las que tienen "
+        "una fuente verificable, quedan **Pendientes de revisión** y te llega un email al terminar."
+    )
+
+    _iatas = set()
+    for v in df_all["IATA"].dropna().astype(str):
+        for parte in v.replace(",", "/").split("/"):
+            if parte.strip():
+                _iatas.add(parte.strip().upper())
+    opciones_lugar = sorted(_iatas)
+
+    cl, cc, cn = st.columns([3, 3, 2])
+    with cl:
+        lug_sel = st.multiselect("Aeropuertos (código)", opciones_lugar, key="desc_lug")
+        lug_extra = st.text_input(
+            "Otros aeropuertos o ciudades", placeholder="ej: SLA, Tartagal, Ushuaia", key="desc_extra"
+        )
+    with cc:
+        cats_sel = st.multiselect("Segmentos", SEGMENTOS, default=SEGMENTOS, key="desc_cats")
+    with cn:
+        lim_desc = st.number_input("Límite por búsqueda", min_value=1, max_value=20, value=10, step=1, key="desc_lim")
+
+    lugares = []
+    for x in lug_sel + [t.strip() for t in lug_extra.split(",") if t.strip()]:
+        if x.lower() not in [y.lower() for y in lugares]:
+            lugares.append(x)
+    n_busq = len(lugares) * len(cats_sel)
+
+    if len(lugares) > MAX_LUGARES:
+        st.error(f"Máximo {MAX_LUGARES} lugares por pedido (elegiste {len(lugares)}).")
+    elif n_busq:
+        st.info(
+            f"Se harán **{n_busq}** búsquedas ({len(lugares)} lugares × {len(cats_sel)} segmentos), "
+            f"hasta **{lim_desc}** empresas cada una. Demora aprox. {max(1, round(n_busq * 1.5))} min; "
+            "después actualizá la lista de abajo."
+        )
+
+    col_b, _ = st.columns([2, 5])
+    with col_b:
+        if st.button(
+            "🔎  Buscar empresas nuevas", type="primary", use_container_width=True,
+            disabled=(n_busq == 0 or len(lugares) > MAX_LUGARES), key="btn_desc",
+        ):
+            with st.spinner("Enviando solicitud a n8n…"):
+                status, resp = disparar_descubrimiento(lugares, cats_sel, int(lim_desc))
+            if status and status < 300:
+                st.success(f"✅ Búsqueda iniciada: {', '.join(lugares)} · {', '.join(cats_sel)}. Te llega un email al terminar.")
+            else:
+                st.error(f"❌ Error {status}: {resp}")
+
+    st.divider()
+    st.subheader("📝  Revisar empresas pendientes")
+
+    cr1, cr2, cr3 = st.columns([3, 3, 2])
+    with cr1:
+        seg_f = st.selectbox("Segmento", ["Todos"] + SEGMENTOS, key="rev_seg")
+    with cr2:
+        fechas_p = sorted([x for x in pend_df["Fecha desc."].astype(str).unique().tolist() if x], reverse=True)
+        fecha_f = st.selectbox("Fecha de descubrimiento", ["Todas"] + fechas_p, key="rev_fecha")
+    with cr3:
+        st.write("")
+        if st.button("🔄  Actualizar lista", key="rev_refresh", use_container_width=True):
+            cargar_todas.clear()
+            st.rerun()
+
+    df_rev = pend_df.copy()
+    if seg_f != "Todos":
+        df_rev = df_rev[df_rev["Segmento"] == seg_f]
+    if fecha_f != "Todas":
+        df_rev = df_rev[df_rev["Fecha desc."].astype(str) == fecha_f]
+    df_rev = df_rev.sort_values(["Fecha desc.", "Razón Social"], ascending=[False, True]).reset_index(drop=True)
+
+    st.caption(f"{len(df_rev)} empresas pendientes")
+
+    if df_rev.empty:
+        st.info("No hay empresas pendientes de revisión.")
+    else:
+        cols_rev = ["Razón Social", "Segmento", "Aeropuerto", "Localidad", "Website", "Fuente desc.", "Servicios", "Fecha desc."]
+        df_rev_show = df_rev[cols_rev].assign(Seleccionar=False)
+        sel_rev = st.data_editor(
+            df_rev_show,
+            column_config={
+                "Seleccionar":  st.column_config.CheckboxColumn("✔ Sel.", width="small"),
+                "Website":      st.column_config.LinkColumn("Website", width="small"),
+                "Fuente desc.": st.column_config.LinkColumn("Fuente", width="small"),
+                "Servicios":    st.column_config.TextColumn("Servicios", width="medium"),
+            },
+            hide_index=True,
+            use_container_width=True,
+            key="editor_rev",
+            disabled=cols_rev,
+        )
+        ids_rev = df_rev.iloc[sel_rev[sel_rev["Seleccionar"]].index]["id"].tolist()
+        n_rev = len(ids_rev)
+
+        ra, rb, _ = st.columns([2, 2, 4])
+        with ra:
+            if st.button(f"✅  Aprobar → En Cola ({n_rev})", disabled=not ids_rev, use_container_width=True, key="btn_aprobar"):
+                err = actualizar_campos(ids_rev, {"Estado revisión": "Aprobada", "En Cola": True})
+                cargar_todas.clear()
+                if err:
+                    st.error(f"No se pudieron actualizar {err} empresas.")
+                else:
+                    st.success(f"{n_rev} empresas aprobadas y puestas En Cola ✅")
+                    time.sleep(0.5)
+                    st.rerun()
+        with rb:
+            if st.button(f"🗑️  Descartar ({n_rev})", disabled=not ids_rev, use_container_width=True, key="btn_descartar"):
+                err = actualizar_campos(ids_rev, {"Estado revisión": "Descartada"})
+                cargar_todas.clear()
+                if err:
+                    st.error(f"No se pudieron actualizar {err} empresas.")
+                else:
+                    st.success(f"{n_rev} empresas descartadas")
+                    time.sleep(0.5)
+                    st.rerun()
+
+    if len(desc_df) > 0:
+        with st.expander(f"🗑️  Descartadas ({len(desc_df)})"):
+            desc_show = desc_df[["Razón Social", "Segmento", "Aeropuerto", "Fecha desc."]].assign(Seleccionar=False).reset_index(drop=True)
+            sel_d = st.data_editor(
+                desc_show,
+                column_config={"Seleccionar": st.column_config.CheckboxColumn("✔ Sel.", width="small")},
+                hide_index=True, use_container_width=True, key="editor_desc",
+                disabled=["Razón Social", "Segmento", "Aeropuerto", "Fecha desc."],
+            )
+            ids_d = desc_df.reset_index(drop=True).iloc[sel_d[sel_d["Seleccionar"]].index]["id"].tolist()
+            if st.button(f"↩️  Volver a Pendiente ({len(ids_d)})", disabled=not ids_d, key="btn_restaurar"):
+                err = actualizar_campos(ids_d, {"Estado revisión": "Pendiente"})
+                cargar_todas.clear()
+                if err:
+                    st.error(f"No se pudieron actualizar {err} empresas.")
+                else:
+                    st.rerun()
