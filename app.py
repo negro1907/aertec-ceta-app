@@ -52,6 +52,9 @@ def cargar_todas():
             confianza = parse_confianza(notas)
             senales  = f.get("Señales / Oportunidad", "")
             investigado = bool(f.get("Nombre Comercial") or senales)
+            if f.get("Fecha descubrimiento"):
+                # Las descubiertas ya traen Nombre Comercial: solo cuentan como investigadas si hay resultados
+                investigado = bool(senales or f.get("Últ. Act. Base"))
             recs.append({
                 "id":             rec["id"],
                 "Razón Social":   f.get("Razón Social", ""),
