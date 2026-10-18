@@ -128,12 +128,29 @@ def disparar_webhook(modo: str, filtro_valor: str = "", limite: int = 50):
 # ─── ESTILOS ─────────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
+/* Tarjetas de métricas: fondo oscuro y texto blanco explícito (alto contraste en cualquier tema) */
 [data-testid="stMetric"] {
-    background: #0d2137;
+    background: #0b1f33;
+    border: 1px solid #1f4568;
     border-radius: 10px;
-    padding: 14px;
+    padding: 14px 16px;
 }
-[data-testid="stMetric"] label { font-size: .75rem; color: #90a4ae; }
+[data-testid="stMetric"] *,
+[data-testid="stMetricLabel"] *,
+[data-testid="stMetricValue"] * { color: #ffffff !important; }
+[data-testid="stMetricLabel"] p { font-size: .95rem !important; font-weight: 600; }
+[data-testid="stMetricValue"] { font-weight: 700; }
+
+/* Textos secundarios (captions): sin transparencia, mismo color que el texto normal */
+[data-testid="stCaptionContainer"], [data-testid="stCaptionContainer"] * {
+    color: inherit !important;
+    opacity: 1 !important;
+    font-size: .95rem !important;
+}
+
+/* Pestañas y etiquetas de campos más legibles */
+button[data-baseweb="tab"] p { font-size: 1.05rem !important; font-weight: 600 !important; }
+[data-testid="stWidgetLabel"] p { font-weight: 600 !important; opacity: 1 !important; }
 </style>
 """, unsafe_allow_html=True)
 
